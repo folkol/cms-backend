@@ -13,7 +13,9 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -22,11 +24,15 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class ContentResource {
     static Map<String, Content> contentMap = new HashMap<>();
     static AtomicInteger nextId = new AtomicInteger();
+    static List<String> changeLog = new ArrayList<>();
+
 
     @GET
     public Map<String, Content> fetchAll() {
         return contentMap;
     }
+
+
 
     @GET
     @Path("{id}")
@@ -47,17 +53,20 @@ public class ContentResource {
         content.put("id", "" + nextId.incrementAndGet());
         contentMap.put(content.get("id"), content);
 
+        changeLog.add(content.get("id"));
         return content;
     }
 
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
-    public Content update(Content content) {
-        if(!content.containsKey("id"))
-            throw new WebApplicationException("missing id", Status.BAD_REQUEST);
+    @Path("{id}")
+    public Content update(@PathParam("id") String id, Content content) {
+        if(!contentMap.containsKey(id))
+            throw new WebApplicationException(Status.NOT_FOUND);
 
-        contentMap.put(content.get("id"), content);
+        contentMap.put(id, content);
 
+        changeLog.add(content.get("id"));
         return content;
     }
 
@@ -71,6 +80,8 @@ public class ContentResource {
         Content content = contentMap.get(id);
         contentMap.remove(id);
 
+
+        changeLog.add(content.get("id"));
         return content;
     }
 

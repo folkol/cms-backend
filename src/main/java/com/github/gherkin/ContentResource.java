@@ -32,8 +32,6 @@ public class ContentResource {
         return contentMap;
     }
 
-
-
     @GET
     @Path("{id}")
     public Content fetch(@PathParam("id") String id) {

@@ -1,4 +1,6 @@
-package com.github.gherkin;
+package com.github.gherkin.service;
+
+import com.github.gherkin.Content;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;

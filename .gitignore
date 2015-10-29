@@ -1,9 +1,5 @@
-# Ignore everything
-*
+.idea
 
-# Except for the source directories
-!src/
-# And pom.xml
-!pom.xml
-# And this file
-!.gitignore
+.git
+
+target/

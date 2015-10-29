@@ -37,6 +37,7 @@ public class ContentResource {
         if(content == null) {
             throw new WebApplicationException(Status.NOT_FOUND);
         }
+
         return content;
     }
 
@@ -59,7 +60,6 @@ public class ContentResource {
 
         content.put("id", "" + nextId.incrementAndGet());
         contentMap.put(content.get("id"), content);
-
         changeLog.add(content.get("id"));
 
         return content;
@@ -73,8 +73,8 @@ public class ContentResource {
             throw new WebApplicationException(Status.NOT_FOUND);
 
         contentMap.put(id, content);
-
         changeLog.add(content.get("id"));
+
         return content;
     }
 
@@ -87,9 +87,8 @@ public class ContentResource {
 
         Content content = contentMap.get(id);
         contentMap.remove(id);
-
-
         changeLog.add(content.get("id"));
+
         return content;
     }
 

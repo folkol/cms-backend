@@ -1,5 +1,6 @@
 package com.github.gherkin;
 
+import com.github.gherkin.service.ContentResource;
 import org.junit.Before;
 import org.junit.Test;
 

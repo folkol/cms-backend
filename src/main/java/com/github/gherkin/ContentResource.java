@@ -1,6 +1,5 @@
 package com.github.gherkin;
 
-
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -26,7 +25,6 @@ public class ContentResource {
     static AtomicInteger nextId = new AtomicInteger();
     static List<String> changeLog = new ArrayList<>();
 
-
     @GET
     public Map<String, Content> fetchAll() {
         return contentMap;
@@ -42,6 +40,17 @@ public class ContentResource {
         return content;
     }
 
+    @GET
+    @Path("changelog/{id}")
+    public Map<String, Content> getChangeLog(@PathParam("id") int id) {
+        Map<String, Content> cache = new HashMap<>();
+        for (int i = id; i < changeLog.size(); i++) {
+            cache.put(changeLog.get(i), contentMap.get(changeLog.get(i)));
+        }
+
+        return cache;
+    }
+
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     public Content insert(Content content) {
@@ -52,6 +61,7 @@ public class ContentResource {
         contentMap.put(content.get("id"), content);
 
         changeLog.add(content.get("id"));
+
         return content;
     }
 

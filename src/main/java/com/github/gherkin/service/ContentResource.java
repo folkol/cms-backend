@@ -1,5 +1,6 @@
 package com.github.gherkin.service;
 
+import com.github.gherkin.ChangeLog;
 import com.github.gherkin.Content;
 import com.github.gherkin.persistence.content.ContentDao;
 
@@ -15,9 +16,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -26,8 +25,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class ContentResource {
     static Map<String, Content> contentMap = new HashMap<>();
     static AtomicInteger nextId = new AtomicInteger();
-    static List<String> changeLog = new ArrayList<>();
-    ContentDao dao = new ContentDao();
+
+    static ContentDao dao = new ContentDao();
+    static ChangeLog changeLog = new ChangeLog();
 
     @GET
     public Map<String, Content> fetchAll() {
@@ -38,12 +38,9 @@ public class ContentResource {
     @Path("{id}")
     public Content fetch(@PathParam("id") String id) {
         Content content;
-        System.out.println("1");
         if(contentMap.containsKey(id)) {
-            System.out.println("2");
             content = contentMap.get(id);
         } else {
-            System.out.println("3");
             content = dao.retrieve(Integer.parseInt(id));
             contentMap.put(content.get("id"), content);
         }
@@ -101,6 +98,7 @@ public class ContentResource {
         contentMap.remove(id);
         dao.remove(Integer.parseInt(id));
         changeLog.add(content.get("id"));
+
 
         return content;
     }

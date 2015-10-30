@@ -1,6 +1,11 @@
 package com.github.gherkin.persistence.changelog;
 
-import javax.persistence.*;
+
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 @Entity
 @Table(name = "changelog")
@@ -9,6 +14,10 @@ public class ChangeLogEntry {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private int ContentId;
+
+    public ChangeLogEntry() {
+
+    }
 
     public ChangeLogEntry(String ContentId) {
         id = null;

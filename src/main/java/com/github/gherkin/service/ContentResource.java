@@ -2,7 +2,9 @@ package com.github.gherkin.service;
 
 import com.github.gherkin.ChangeLog;
 import com.github.gherkin.Content;
+import com.github.gherkin.persistence.changelog.ChangeLogDao;
 import com.github.gherkin.persistence.content.ContentDao;
+import com.google.inject.Inject;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -23,11 +25,15 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Produces(MediaType.APPLICATION_JSON)
 @Path("content")
 public class ContentResource {
-    static Map<String, Content> contentMap = new HashMap<>();
-    static AtomicInteger nextId = new AtomicInteger();
+    @Inject
+    static Map<String, Content> contentMap;
+    @Inject
+    static AtomicInteger nextId;
+    @Inject
+    private ContentDao dao;
+    @Inject
+    private ChangeLog changeLog;
 
-    static ContentDao dao = new ContentDao();
-    static ChangeLog changeLog = new ChangeLog();
 
     @GET
     public Map<String, Content> fetchAll() {
@@ -101,6 +107,14 @@ public class ContentResource {
 
 
         return content;
+    }
+
+    public void setDao(ContentDao dao) {
+        this.dao = dao;
+    }
+
+    public void setChangeLog(ChangeLog changeLog) {
+        this.changeLog = changeLog;
     }
 
 }

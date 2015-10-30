@@ -1,7 +1,6 @@
 package com.github.gherkin.persistence.content;
 
 import com.github.gherkin.Content;
-import com.github.gherkin.persistence.ContentEntity_;
 import com.github.gherkin.persistence.GenericDao;
 
 import javax.persistence.EntityManager;

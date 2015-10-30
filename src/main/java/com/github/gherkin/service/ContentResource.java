@@ -32,7 +32,7 @@ public class ContentResource {
 
     @GET
     public Map<String, Content> fetchAll() {
-        return contentMap;
+        return dao.retrieveAll();
     }
 
     @GET

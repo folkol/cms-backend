@@ -1,4 +1,8 @@
-package com.github.gherkin;
+package com.github.gherkin.service;
+
+import com.github.gherkin.Content;
+import com.github.gherkin.persistence.ContentDao;
+import com.github.gherkin.persistence.ContentDaoMySql;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -24,6 +28,7 @@ public class ContentResource {
     static Map<String, Content> contentMap = new HashMap<>();
     static AtomicInteger nextId = new AtomicInteger();
     static List<String> changeLog = new ArrayList<>();
+    ContentDao dao = new ContentDaoMySql();
 
     @GET
     public Map<String, Content> fetchAll() {
@@ -33,9 +38,15 @@ public class ContentResource {
     @GET
     @Path("{id}")
     public Content fetch(@PathParam("id") String id) {
-        Content content = contentMap.get(id);
-        if(content == null) {
-            throw new WebApplicationException(Status.NOT_FOUND);
+        Content content;
+        System.out.println("1");
+        if(contentMap.containsKey(id)) {
+            System.out.println("2");
+            content = contentMap.get(id);
+        } else {
+            System.out.println("3");
+            content = dao.retrieve(Integer.parseInt(id));
+            contentMap.put(content.get("id"), content);
         }
 
         return content;
@@ -60,6 +71,7 @@ public class ContentResource {
 
         content.put("id", "" + nextId.incrementAndGet());
         contentMap.put(content.get("id"), content);
+        dao.save(content);
         changeLog.add(content.get("id"));
 
         return content;
@@ -73,6 +85,7 @@ public class ContentResource {
             throw new WebApplicationException(Status.NOT_FOUND);
 
         contentMap.put(id, content);
+        dao.insert(content);
         changeLog.add(content.get("id"));
 
         return content;
@@ -87,6 +100,7 @@ public class ContentResource {
 
         Content content = contentMap.get(id);
         contentMap.remove(id);
+        dao.remove(Integer.parseInt(id));
         changeLog.add(content.get("id"));
 
         return content;

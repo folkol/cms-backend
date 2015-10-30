@@ -1,8 +1,7 @@
 package com.github.gherkin.service;
 
 import com.github.gherkin.Content;
-import com.github.gherkin.persistence.ContentDao;
-import com.github.gherkin.persistence.ContentDaoMySql;
+import com.github.gherkin.persistence.content.ContentDao;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -28,11 +27,11 @@ public class ContentResource {
     static Map<String, Content> contentMap = new HashMap<>();
     static AtomicInteger nextId = new AtomicInteger();
     static List<String> changeLog = new ArrayList<>();
-    ContentDao dao = new ContentDaoMySql();
+    ContentDao dao = new ContentDao();
 
     @GET
     public Map<String, Content> fetchAll() {
-        return dao.retrieveAll();
+        return dao.retrieveAllMap();
     }
 
     @GET

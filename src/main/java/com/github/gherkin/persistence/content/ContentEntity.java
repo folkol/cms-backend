@@ -1,4 +1,4 @@
-package com.github.gherkin.persistence;
+package com.github.gherkin.persistence.content;
 
 import javax.persistence.*;
 import java.util.Map;

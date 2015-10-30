@@ -1,8 +1,9 @@
 package com.github.gherkin.service;
 
+import com.github.gherkin.ChangeLog;
 import com.github.gherkin.Content;
-import com.github.gherkin.persistence.ContentDao;
-import com.github.gherkin.persistence.ContentDaoMySql;
+import com.github.gherkin.persistence.content.ContentDao;
+import com.google.inject.Inject;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -16,37 +17,44 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Produces(MediaType.APPLICATION_JSON)
 @Path("content")
 public class ContentResource {
-    static Map<String, Content> contentMap = new HashMap<>();
-    static AtomicInteger nextId = new AtomicInteger();
-    static List<String> changeLog = new ArrayList<>();
-    ContentDao dao = new ContentDaoMySql();
+    @Inject
+    static Map<String, Content> contentMap;
+    @Inject
+    static AtomicInteger nextId;
+    @Inject
+    private ContentDao dao;
+    @Inject
+    private ChangeLog changeLog;
+
 
     @GET
     public Map<String, Content> fetchAll() {
-        return dao.retrieveAll();
+        return dao.retrieveAllMap();
     }
 
     @GET
     @Path("{id}")
     public Content fetch(@PathParam("id") String id) {
         Content content;
-        System.out.println("1");
         if(contentMap.containsKey(id)) {
-            System.out.println("2");
             content = contentMap.get(id);
         } else {
-            System.out.println("3");
-            content = dao.retrieve(Integer.parseInt(id));
-            contentMap.put(content.get("id"), content);
+            try {
+                content = dao.retrieve(Integer.parseInt(id));
+                if(content == null) {
+                    throw new WebApplicationException(Status.NOT_FOUND);
+                }
+                contentMap.put(content.get("id"), content);
+            } catch(NumberFormatException exception) {
+                throw new WebApplicationException("path parameter is not a number", Status.BAD_REQUEST);
+            }
         }
 
         return content;
@@ -81,8 +89,7 @@ public class ContentResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("{id}")
     public Content update(@PathParam("id") String id, Content content) {
-        if(!contentMap.containsKey(id))
-            throw new WebApplicationException(Status.NOT_FOUND);
+        fetch(id);
 
         contentMap.put(id, content);
         dao.insert(content);
@@ -94,16 +101,26 @@ public class ContentResource {
     @DELETE
     @Path("{id}")
     public Content remove(@PathParam("id") String id) {
-        if(!contentMap.containsKey(id)) {
-            throw new WebApplicationException(Status.NOT_FOUND);
-        }
+        fetch(id);
 
         Content content = contentMap.get(id);
         contentMap.remove(id);
         dao.remove(Integer.parseInt(id));
         changeLog.add(content.get("id"));
 
+
         return content;
     }
 
+    public static Map<String, Content> getContentMap() {
+        return contentMap;
+    }
+
+    public static void setNextId(AtomicInteger nextId) {
+        ContentResource.nextId = nextId;
+    }
+
+    public static void setContentMap(Map<String, Content> contentMap) {
+        ContentResource.contentMap = contentMap;
+    }
 }

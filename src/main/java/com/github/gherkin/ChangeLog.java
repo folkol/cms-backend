@@ -1,13 +1,14 @@
 package com.github.gherkin;
 
 import com.github.gherkin.persistence.changelog.ChangeLogDao;
+import com.google.inject.Inject;
 
 import java.util.ArrayList;
 
 public class ChangeLog extends ArrayList<String> {
+    @Inject
     ChangeLogDao dao;
     public ChangeLog() {
-        dao = new ChangeLogDao();
         this.addAll(dao.retrieveAll());
     }
 

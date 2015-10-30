@@ -61,16 +61,18 @@ public class ContentDaoMySql implements ContentDao {
         Map<String, Content> result = new HashMap<>();
 
         try {
-            String queryString = "SELECT c FROM content c";
+            String queryString = "SELECT c FROM ContentEntity c";
 
             transaction.begin();
 
             Query query = entityManager.createQuery(queryString);
-            List<Content> contents = query.getResultList();
+            List<ContentEntity> entityList = query.getResultList();
 
             transaction.commit();
 
-            for(Content content : contents) {
+
+            for(ContentEntity contentEntity : entityList) {
+                Content content = entityToData(contentEntity);
                 result.put(content.get("id"), content);
             }
 

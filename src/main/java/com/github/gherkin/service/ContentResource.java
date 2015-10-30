@@ -2,7 +2,6 @@ package com.github.gherkin.service;
 
 import com.github.gherkin.ChangeLog;
 import com.github.gherkin.Content;
-import com.github.gherkin.persistence.changelog.ChangeLogDao;
 import com.github.gherkin.persistence.content.ContentDao;
 import com.google.inject.Inject;
 
@@ -47,8 +46,15 @@ public class ContentResource {
         if(contentMap.containsKey(id)) {
             content = contentMap.get(id);
         } else {
-            content = dao.retrieve(Integer.parseInt(id));
-            contentMap.put(content.get("id"), content);
+            try {
+                content = dao.retrieve(Integer.parseInt(id));
+                if(content == null) {
+                    throw new WebApplicationException(Status.NOT_FOUND);
+                }
+                contentMap.put(content.get("id"), content);
+            } catch(NumberFormatException exception) {
+                throw new WebApplicationException("path parameter is not a number", Status.BAD_REQUEST);
+            }
         }
 
         return content;
@@ -83,8 +89,7 @@ public class ContentResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("{id}")
     public Content update(@PathParam("id") String id, Content content) {
-        if(!contentMap.containsKey(id))
-            throw new WebApplicationException(Status.NOT_FOUND);
+        fetch(id);
 
         contentMap.put(id, content);
         dao.insert(content);
@@ -96,9 +101,7 @@ public class ContentResource {
     @DELETE
     @Path("{id}")
     public Content remove(@PathParam("id") String id) {
-        if(!contentMap.containsKey(id)) {
-            throw new WebApplicationException(Status.NOT_FOUND);
-        }
+        fetch(id);
 
         Content content = contentMap.get(id);
         contentMap.remove(id);
@@ -109,12 +112,15 @@ public class ContentResource {
         return content;
     }
 
-    public void setDao(ContentDao dao) {
-        this.dao = dao;
+    public static Map<String, Content> getContentMap() {
+        return contentMap;
     }
 
-    public void setChangeLog(ChangeLog changeLog) {
-        this.changeLog = changeLog;
+    public static void setNextId(AtomicInteger nextId) {
+        ContentResource.nextId = nextId;
     }
 
+    public static void setContentMap(Map<String, Content> contentMap) {
+        ContentResource.contentMap = contentMap;
+    }
 }

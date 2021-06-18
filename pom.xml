@@ -247,7 +247,7 @@
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-guice</artifactId>
-            <version>3.0.13.Final</version>
+            <version>3.11.0.Final</version>
         </dependency>
     </dependencies>
 
